@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ads Intelligence Platform — Preview</title>
+<style>
+  :root {
+    color-scheme: light;
+    --paper:      #f9f9f7;
+    --surface:    #fcfcfb;
+    --surface-2:  #f2f1ed;
+    --ink:        #0b0b0b;
+    --ink-2:      #52514e;
+    --ink-muted:  #898781;
+    --border:     rgba(11,11,11,0.10);
+    --border-2:   rgba(11,11,11,0.16);
+    --accent:     #146c74;
+    --accent-ink: #ffffff;
+    --accent-wash:rgba(20,108,116,0.10);
+
+    --good:     #0ca30c;
+    --good-bg:  rgba(12,163,12,0.12);
+    --warn:     #a86a00;
+    --warn-bg:  rgba(250,178,25,0.20);
+    --crit:     #d03b3b;
+    --crit-bg:  rgba(208,59,59,0.12);
+    --muted-bg: rgba(11,11,11,0.05);
+
+    --cat-google:  #2a78d6;
+    --cat-msft:    #eb6834;
+    --cat-meta:    #1baf7a;
+    --cat-openai:  #c98500;
+    --cat-reddit:  #e87ba4;
+
+    --shadow: 0 1px 2px rgba(11,11,11,0.04), 0 8px 24px -12px rgba(11,11,11,0.18);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:where(:not([data-theme="light"])) {
+      color-scheme: dark;
+      --paper:      #0d0d0d;
+      --surface:    #1a1a19;
+      --surface-2:  #222220;
+      --ink:        #ffffff;
+      --ink-2:      #c3c2b7;
+      --ink-muted:  #898781;
+      --border:     rgba(255,255,255,0.10);
+      --border-2:   rgba(255,255,255,0.18);
+      --accent:     #4ac0c9;
+      --accent-ink: #04211f;
+      --accent-wash:rgba(74,192,201,0.14);
+
+      --good:     #0ca30c;
+      --good-bg:  rgba(12,163,12,0.18);
+      --warn:     #fab219;
+      --warn-bg:  rgba(250,178,25,0.16);
+      --crit:     #e2635f;
+      --crit-bg:  rgba(208,59,59,0.20);
+      --muted-bg: rgba(255,255,255,0.06);
+
+      --cat-google:  #3987e5;
+      --cat-msft:    #d95926;
+      --cat-meta:    #199e70;
+      --cat-openai:  #d9a324;
+      --cat-reddit:  #d55181;
+
+      --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 8px 24px -12px rgba(0,0,0,0.6);
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --paper:      #0d0d0d;
+    --surface:    #1a1a19;
+    --surface-2:  #222220;
+    --ink:        #ffffff;
+    --ink-2:      #c3c2b7;
+    --ink-muted:  #898781;
+    --border:     rgba(255,255,255,0.10);
+    --border-2:   rgba(255,255,255,0.18);
+    --accent:     #4ac0c9;
+    --accent-ink: #04211f;
+    --accent-wash:rgba(74,192,201,0.14);
+    --good:     #0ca30c;
+    --good-bg:  rgba(12,163,12,0.18);
+    --warn:     #fab219;
+    --warn-bg:  rgba(250,178,25,0.16);
+    --crit:     #e2635f;
+    --crit-bg:  rgba(208,59,59,0.20);
+    --muted-bg: rgba(255,255,255,0.06);
+    --cat-google:  #3987e5;
+    --cat-msft:    #d95926;
+    --cat-meta:    #199e70;
+    --cat-openai:  #d9a324;
+    --cat-reddit:  #d55181;
+    --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 8px 24px -12px rgba(0,0,0,0.6);
+  }
+  :root[data-theme="light"] {
+    color-scheme: light;
+    --paper: #f9f9f7; --surface: #fcfcfb; --surface-2: #f2f1ed;
+    --ink: #0b0b0b; --ink-2: #52514e; --ink-muted: #898781;
+    --border: rgba(11,11,11,0.10); --border-2: rgba(11,11,11,0.16);
+    --accent: #146c74; --accent-ink: #ffffff; --accent-wash: rgba(20,108,116,0.10);
+    --good: #0ca30c; --good-bg: rgba(12,163,12,0.12);
+    --warn: #a86a00; --warn-bg: rgba(250,178,25,0.20);
+    --crit: #d03b3b; --crit-bg: rgba(208,59,59,0.12);
+    --muted-bg: rgba(11,11,11,0.05);
+    --cat-google: #2a78d6; --cat-msft: #eb6834; --cat-meta: #1baf7a;
+    --cat-openai: #c98500; --cat-reddit: #e87ba4;
+    --shadow: 0 1px 2px rgba(11,11,11,0.04), 0 8px 24px -12px rgba(11,11,11,0.18);
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: -apple-system, "Segoe UI", system-ui, Roboto, Helvetica, Arial, sans-serif;
+    font-size: 14px;
+    line-height: 1.45;
+    -webkit-font-smoothing: antialiased;
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+  .mono {
+    font-family: ui-monospace, "SF Mono", "Cascadia Mono", "Segoe UI Mono", Consolas, monospace;
+    font-variant-numeric: tabular-nums;
+  }
+  .eyebrow {
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-muted);
+  }
+  a { color: var(--accent); text-decoration: none; }
+  button { font-family: inherit; }
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    * { transition: none !important; animation: none !important; }
+  }
+
+  .shell {
+    max-width: 1240px;
+    margin: 0 auto;
+    padding: 20px 20px 64px;
+  }
+
+  /* ---------- Topbar ---------- */
+  .topbar {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 20px;
+  }
+  .brand { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+  .brand .mark {
+    font-family: ui-monospace, "SF Mono", "Cascadia Mono", "Segoe UI Mono", Consolas, monospace;
+    font-weight: 700;
+    font-size: 15px;
+    letter-spacing: 0.02em;
+  }
+  .brand .sub { color: var(--ink-muted); font-size: 12.5px; }
+  .preview-tag {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 10px; font-weight: 700; letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--accent);
+    background: var(--accent-wash);
+    border: 1px solid color-mix(in srgb, var(--accent) 40%, transparent);
+    border-radius: 20px;
+    padding: 3px 9px 3px 7px;
+  }
+  .preview-tag .dot { width: 5px; height: 5px; border-radius: 50%; background: var(--accent); }
+
+  .topbar-controls { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .tabs {
+    display: inline-flex;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 2px;
+    gap: 2px;
+  }
+  .tabs button {
+    border: none; background: transparent; color: var(--ink-2);
+    font-size: 12.5px; font-weight: 600; padding: 6px 12px;
+    border-radius: 6px; cursor: pointer;
+  }
+  .tabs button[aria-selected="true"] {
+    background: var(--surface); color: var(--ink);
+    box-shadow: var(--shadow);
+  }
+  .date-chip {
+    font-size: 12.5px; color: var(--ink-2);
+    border: 1px solid var(--border); border-radius: 8px;
+    padding: 6px 10px;
+    display: inline-flex; align-items: center; gap: 6px;
+  }
+  .date-chip .mono { color: var(--ink); font-weight: 600; }
+
+  /* ---------- Signal strip ---------- */
+  .signal-strip {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0,1fr));
+    gap: 10px;
+    margin-bottom: 24px;
+  }
+  .signal {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 14px;
+    display: flex; flex-direction: column; gap: 8px;
+    min-width: 0;
+  }
+  .signal[data-state="pending"] { border-style: dashed; opacity: 0.72; }
+  .signal-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+  .signal-platform { display: flex; align-items: center; gap: 7px; min-width: 0; }
+  .cat-dot { width: 8px; height: 8px; border-radius: 50%; flex: none; }
+  .signal-name { font-size: 12px; font-weight: 700; letter-spacing: 0.01em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .status-pill {
+    display: inline-flex; align-items: center; gap: 5px;
+    font-size: 10.5px; font-weight: 700; letter-spacing: 0.03em;
+    padding: 2px 7px; border-radius: 20px; flex: none;
+  }
+  .status-pill.good { color: var(--good); background: var(--good-bg); }
+  .status-pill.warn { color: var(--warn); background: var(--warn-bg); }
+  .status-pill.crit { color: var(--crit); background: var(--crit-bg); }
+  .status-pill.pending { color: var(--ink-muted); background: var(--muted-bg); }
+  .status-pill .dot { width: 5px; height: 5px; border-radius: 50%; background: currentColor; }
+  .signal-detail { font-size: 11.5px; color: var(--ink-muted); }
+  .signal-spark { height: 26px; }
+
+  /* ---------- Layout grid ---------- */
+  .grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 320px;
+    gap: 20px;
+    align-items: start;
+  }
+  @media (max-width: 880px) {
+    .grid { grid-template-columns: minmax(0, 1fr); }
+    .signal-strip { grid-template-columns: repeat(2, minmax(0,1fr)); }
+  }
+
+  .panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px 16px 6px;
+    margin-bottom: 20px;
+  }
+  .panel-head {
+    display: flex; align-items: baseline; justify-content: space-between;
+    margin-bottom: 12px; gap: 10px; flex-wrap: wrap;
+  }
+  .panel-title { font-size: 14px; font-weight: 700; }
+  .panel-note { font-size: 11.5px; color: var(--ink-muted); }
+
+  /* ---------- Stat tiles ---------- */
+  .stat-row {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0,1fr));
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 20px;
+  }
+  @media (max-width: 720px) { .stat-row { grid-template-columns: repeat(2, minmax(0,1fr)); } }
+  .stat {
+    background: var(--surface);
+    padding: 14px 14px 12px;
+    display: flex; flex-direction: column; gap: 6px;
+    min-width: 0;
+  }
+  .stat-label { font-size: 10.5px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-muted); }
+  .stat-value { font-size: 22px; font-weight: 700; letter-spacing: -0.01em; }
+  .stat-value.na { color: var(--ink-muted); font-size: 15px; font-weight: 600; }
+  .stat-delta { font-size: 11.5px; font-weight: 600; display: inline-flex; align-items: center; gap: 3px; }
+  .stat-delta.up.good { color: var(--good); }
+  .stat-delta.up.bad { color: var(--crit); }
+  .stat-delta.down.good { color: var(--good); }
+  .stat-delta.down.bad { color: var(--crit); }
+  .stat-delta.flat { color: var(--ink-muted); }
+
+  /* ---------- Anomaly board ---------- */
+  .anom-row {
+    border-top: 1px solid var(--border);
+    padding: 12px 0;
+    cursor: pointer;
+  }
+  .anom-row:first-of-type { border-top: none; }
+  .anom-top { display: flex; align-items: flex-start; gap: 10px; }
+  .sev-stripe { width: 3px; border-radius: 3px; flex: none; align-self: stretch; min-height: 20px; }
+  .sev-stripe.alert { background: var(--crit); }
+  .sev-stripe.warnv { background: var(--warn); }
+  .anom-body { flex: 1; min-width: 0; }
+  .anom-line1 { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .sev-tag { font-size: 10px; font-weight: 800; letter-spacing: 0.05em; padding: 1px 6px; border-radius: 4px; flex: none; }
+  .sev-tag.alert { color: var(--crit); background: var(--crit-bg); }
+  .sev-tag.warnv { color: var(--warn); background: var(--warn-bg); }
+  .plat-tag { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 700; }
+  .anom-campaign { font-size: 13px; font-weight: 600; }
+  .anom-meta { font-size: 11.5px; color: var(--ink-muted); margin-top: 2px; }
+  .anom-metric { font-size: 12px; font-weight: 700; margin-left: auto; flex: none; }
+  .anom-metric.good { color: var(--good); }
+  .anom-metric.bad { color: var(--crit); }
+  .anom-chev { color: var(--ink-muted); flex: none; transition: transform 0.15s ease; margin-left: 4px; }
+  .anom-row[aria-expanded="true"] .anom-chev { transform: rotate(90deg); }
+  .anom-detail {
+    display: none;
+    margin: 10px 0 2px 13px;
+    padding: 10px 12px;
+    background: var(--surface-2);
+    border-radius: 8px;
+    font-size: 12px;
+    color: var(--ink-2);
+  }
+  .anom-row[aria-expanded="true"] .anom-detail { display: block; }
+  .anom-detail b { color: var(--ink); }
+
+  /* ---------- Quick wins ---------- */
+  .qw-row {
+    display: flex; gap: 10px; align-items: flex-start;
+    border-top: 1px solid var(--border);
+    padding: 11px 0;
+  }
+  .qw-row:first-of-type { border-top: none; }
+  .qw-icon {
+    width: 22px; height: 22px; border-radius: 6px; flex: none;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 800;
+    background: var(--accent-wash); color: var(--accent);
+  }
+  .qw-icon.risk { background: var(--warn-bg); color: var(--warn); }
+  .qw-text { font-size: 12.5px; }
+  .qw-text b { font-weight: 700; }
+  .qw-sub { color: var(--ink-muted); font-size: 11.5px; margin-top: 1px; }
+
+  /* ---------- Pacing ---------- */
+  .pace-row { padding: 10px 0; border-top: 1px solid var(--border); }
+  .pace-row:first-of-type { border-top: none; }
+  .pace-top { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 6px; gap: 8px; }
+  .pace-name { display: flex; align-items: center; gap: 7px; font-size: 12px; font-weight: 700; }
+  .pace-pct { font-size: 11.5px; font-weight: 700; }
+  .pace-pct.on { color: var(--good); }
+  .pace-pct.under { color: var(--warn); }
+  .pace-pct.over { color: var(--ink-2); }
+  .pace-track { position: relative; height: 6px; background: var(--surface-2); border-radius: 3px; overflow: hidden; }
+  .pace-fill { position: absolute; inset: 0 auto 0 0; border-radius: 3px; }
+  .pace-target { position: absolute; top: -3px; bottom: -3px; width: 2px; background: var(--ink-muted); }
+  .pace-sub { font-size: 11px; color: var(--ink-muted); margin-top: 5px; }
+
+  /* ---------- Chat preview ---------- */
+  .chat-toggle {
+    width: 100%; display: flex; align-items: center; justify-content: space-between;
+    background: none; border: none; padding: 0 0 12px; cursor: pointer; color: inherit;
+  }
+  .chat-toggle .panel-title { display: flex; align-items: center; gap: 7px; }
+  .chat-body { display: none; }
+  .chat-body[data-open="true"] { display: block; }
+  .bubble {
+    border-radius: 10px; padding: 9px 11px; font-size: 12.5px; margin-bottom: 8px;
+    max-width: 92%;
+  }
+  .bubble.user {
+    background: var(--surface-2); margin-left: auto; color: var(--ink);
+  }
+  .bubble.ai {
+    background: var(--accent-wash); border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent);
+  }
+  .bubble.ai .lbl { color: var(--accent); font-weight: 700; font-size: 10px; letter-spacing: 0.05em; text-transform: uppercase; display: block; margin-bottom: 4px; }
+  .chat-input {
+    display: flex; gap: 8px; margin-top: 4px; margin-bottom: 12px;
+  }
+  .chat-input input {
+    flex: 1; border: 1px solid var(--border); border-radius: 8px; padding: 8px 10px;
+    font-size: 12.5px; background: var(--surface); color: var(--ink-muted);
+  }
+  .chat-input button {
+    border: none; background: var(--surface-2); color: var(--ink-muted);
+    border-radius: 8px; padding: 8px 12px; font-size: 12px; font-weight: 600;
+  }
+
+  .footnote {
+    font-size: 11.5px; color: var(--ink-muted); margin-top: 8px; padding-top: 16px;
+    border-top: 1px solid var(--border);
+  }
+  .footnote code {
+    font-family: ui-monospace, "SF Mono", Consolas, monospace;
+    background: var(--surface-2); padding: 1px 5px; border-radius: 4px; font-size: 11px;
+  }
+
+  .hide { display: none !important; }
+
+  /* ---------- Live pipeline check ---------- */
+  .live-panel { border: 1px solid color-mix(in srgb, var(--good) 35%, var(--border)); }
+  .live-tag {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 10px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
+    color: var(--good); background: var(--good-bg);
+    border-radius: 20px; padding: 3px 9px 3px 7px;
+  }
+  .live-tag .dot { width: 5px; height: 5px; border-radius: 50%; background: var(--good); }
+  .live-grid {
+    display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 12px; margin-bottom: 14px;
+  }
+  @media (max-width: 720px) { .live-grid { grid-template-columns: minmax(0,1fr); } }
+  .live-card {
+    background: var(--surface-2); border-radius: 10px; padding: 12px 14px;
+    display: flex; flex-direction: column; gap: 8px; min-width: 0;
+  }
+  .live-card-head { display: flex; align-items: center; justify-content: space-between; gap: 6px; }
+  .live-card-title { font-size: 12px; font-weight: 700; display: flex; align-items: center; gap: 6px; }
+  .live-days { font-size: 10.5px; color: var(--ink-muted); }
+  .live-metrics { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 8px 12px; }
+  .live-metric-label { font-size: 10px; color: var(--ink-muted); text-transform: uppercase; letter-spacing: 0.04em; }
+  .live-metric-value { font-size: 15px; font-weight: 700; }
+  .live-flag {
+    display: flex; gap: 7px; align-items: flex-start;
+    background: var(--warn-bg); color: var(--warn);
+    border-radius: 8px; padding: 7px 9px; font-size: 11.5px; font-weight: 600;
+  }
+  .live-flag.crit { background: var(--crit-bg); color: var(--crit); }
+  .live-note { font-size: 11px; color: var(--ink-muted); }
+</style>
+</head>
+<body>
+
+<div class="shell">
+
+  <div class="topbar">
+    <div class="brand">
+      <span class="mark">ADS INTELLIGENCE</span>
+      <span class="sub">The Bid Lab · Bid Banana</span>
+      <span class="preview-tag"><span class="dot"></span>Preview — sample data</span>
+    </div>
+    <div class="topbar-controls">
+      <div class="tabs" id="accountTabs" role="tablist" aria-label="Account">
+        <button role="tab" aria-selected="true" data-account="all">All accounts</button>
+        <button role="tab" aria-selected="false" data-account="banana">Bid Banana</button>
+        <button role="tab" aria-selected="false" data-account="lab">The Bid Lab</button>
+      </div>
+      <div class="date-chip">Trailing 7d <span class="mono">Jul 16–22</span></div>
+    </div>
+  </div>
+
+  <div class="signal-strip">
+    <div class="signal">
+      <div class="signal-head">
+        <div class="signal-platform"><span class="cat-dot" style="background:var(--cat-google)"></span><span class="signal-name">Google Ads</span></div>
+        <span class="status-pill crit"><span class="dot"></span>Alert</span>
+      </div>
+      <div class="signal-detail">Impressions down sharply on 1 campaign</div>
+      <svg class="signal-spark" viewBox="0 0 100 26" preserveAspectRatio="none"><path d="M0,10 L14,9 L28,12 L42,8 L56,14 L70,11 L84,4 L100,18" fill="none" stroke="var(--cat-google)" stroke-width="2" stroke-linecap="round"/><circle cx="100" cy="18" r="2.4" fill="var(--cat-google)"/></svg>
+    </div>
+    <div class="signal">
+      <div class="signal-head">
+        <div class="signal-platform"><span class="cat-dot" style="background:var(--cat-msft)"></span><span class="signal-name">Microsoft Ads</span></div>
+        <span class="status-pill warn"><span class="dot"></span>Warn</span>
+      </div>
+      <div class="signal-detail">Limited by budget, 4 days running</div>
+      <svg class="signal-spark" viewBox="0 0 100 26" preserveAspectRatio="none"><path d="M0,6 L14,8 L28,7 L42,12 L56,15 L70,16 L84,17 L100,17" fill="none" stroke="var(--cat-msft)" stroke-width="2" stroke-linecap="round"/><circle cx="100" cy="17" r="2.4" fill="var(--cat-msft)"/></svg>
+    </div>
+    <div class="signal">
+      <div class="signal-head">
+        <div class="signal-platform"><span class="cat-dot" style="background:var(--cat-meta)"></span><span class="signal-name">Meta</span></div>
+        <span class="status-pill crit"><span class="dot"></span>Alert</span>
+      </div>
+      <div class="signal-detail">2 ads disapproved on 1 campaign</div>
+      <svg class="signal-spark" viewBox="0 0 100 26" preserveAspectRatio="none"><path d="M0,14 L14,12 L28,13 L42,10 L56,9 L70,7 L84,6 L100,8" fill="none" stroke="var(--cat-meta)" stroke-width="2" stroke-linecap="round"/><circle cx="100" cy="8" r="2.4" fill="var(--cat-meta)"/></svg>
+    </div>
+    <div class="signal">
+      <div class="signal-head">
+        <div class="signal-platform"><span class="cat-dot" style="background:var(--cat-openai)"></span><span class="signal-name">ChatGPT Ads</span></div>
+        <span class="status-pill warn"><span class="dot"></span>Warn</span>
+      </div>
+      <div class="signal-detail">Spend pacing low · no conversion data</div>
+      <svg class="signal-spark" viewBox="0 0 100 26" preserveAspectRatio="none"><path d="M0,8 L14,10 L28,13 L42,15 L56,16 L70,18 L84,19 L100,19" fill="none" stroke="var(--cat-openai)" stroke-width="2" stroke-linecap="round"/><circle cx="100" cy="19" r="2.4" fill="var(--cat-openai)"/></svg>
+    </div>
+    <div class="signal" data-state="pending">
+      <div class="signal-head">
+        <div class="signal-platform"><span class="cat-dot" style="background:var(--cat-reddit)"></span><span class="signal-name">Reddit Ads</span></div>
+        <span class="status-pill pending"><span class="dot"></span>Pending</span>
+      </div>
+      <div class="signal-detail">Awaiting account access — Phase 0</div>
+    </div>
+  </div>
+
+  <div class="grid">
+    <div class="col-primary">
+
+      <div class="panel live-panel">
+        <div class="panel-head">
+          <div class="panel-title">Live pipeline check</div>
+          <span class="live-tag"><span class="dot"></span>Real data · pulled Jul 29</span>
+        </div>
+        <div class="live-grid">
+          <div class="live-card">
+            <div class="live-card-head">
+              <div class="live-card-title"><span class="cat-dot" style="background:var(--cat-google)"></span>Google Ads · Bid Banana</div>
+            </div>
+            <div class="live-days mono">Jul 20–29 · 8 days seen</div>
+            <div class="live-metrics">
+              <div><div class="live-metric-label">Spend</div><div class="live-metric-value mono">$1,351.25</div></div>
+              <div><div class="live-metric-label">Impressions</div><div class="live-metric-value mono">3,488</div></div>
+              <div><div class="live-metric-label">Clicks</div><div class="live-metric-value mono">342</div></div>
+              <div><div class="live-metric-label">CPA</div><div class="live-metric-value mono">$128.69</div></div>
+            </div>
+          </div>
+          <div class="live-card">
+            <div class="live-card-head">
+              <div class="live-card-title"><span class="cat-dot" style="background:var(--cat-google)"></span>Google Ads · The Bid Lab</div>
+            </div>
+            <div class="live-days mono">Jul 20–21 · 2 days seen</div>
+            <div class="live-metrics">
+              <div><div class="live-metric-label">Spend</div><div class="live-metric-value mono">$146.30</div></div>
+              <div><div class="live-metric-label">Impressions</div><div class="live-metric-value mono">414</div></div>
+              <div><div class="live-metric-label">Clicks</div><div class="live-metric-value mono">38</div></div>
+              <div><div class="live-metric-label">Conversions</div><div class="live-metric-value mono">0</div></div>
+            </div>
+            <div class="live-flag crit">37 of 38 campaigns are <code>not_serving</code> — only 1 is eligible. Worth checking today, not from the (not-yet-built) anomaly engine, just from the raw pull.</div>
+          </div>
+          <div class="live-card">
+            <div class="live-card-head">
+              <div class="live-card-title"><span class="cat-dot" style="background:var(--cat-openai)"></span>ChatGPT Ads · Bid Banana</div>
+            </div>
+            <div class="live-days mono">Jul 23–28 · 6 days seen</div>
+            <div class="live-metrics">
+              <div><div class="live-metric-label">Spend</div><div class="live-metric-value mono">$129.86</div></div>
+              <div><div class="live-metric-label">Impressions</div><div class="live-metric-value mono">4,919</div></div>
+              <div><div class="live-metric-label">Clicks</div><div class="live-metric-value mono">43</div></div>
+              <div><div class="live-metric-label">Conversions</div><div class="live-metric-value mono na">n/a</div></div>
+            </div>
+          </div>
+        </div>
+        <div class="live-note">Microsoft Ads and Meta aren't shown here — still finishing their credentials. Everything below this panel is still the sample-data design preview.</div>
+      </div>
+
+      <div class="stat-row" id="statRow">
+        <!-- populated by JS per account -->
+      </div>
+
+      <div class="panel">
+        <div class="panel-head">
+          <div class="panel-title">Anomalies &amp; likely causes</div>
+          <div class="panel-note">Click a row for the suggested check</div>
+        </div>
+        <div id="anomList"></div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head">
+          <div class="panel-title">Quick wins</div>
+          <div class="panel-note">Same-day actions</div>
+        </div>
+        <div class="qw-row">
+          <div class="qw-icon">↑</div>
+          <div class="qw-text"><b>Scale up</b> — The Bid Lab · Google Ads · Branded Search<div class="qw-sub">CPA 39% below 90-day baseline (z=−1.9). Test a budget increase.</div></div>
+        </div>
+        <div class="qw-row">
+          <div class="qw-icon risk">$</div>
+          <div class="qw-text"><b>Raise budget or adjust bid strategy</b> — Microsoft Ads · Federal Contracting Keywords<div class="qw-sub">Limited by budget 4 consecutive days — likely losing eligible volume.</div></div>
+        </div>
+        <div class="qw-row">
+          <div class="qw-icon risk">!</div>
+          <div class="qw-text"><b>Fix disapproved ads</b> — Meta · Trial Abandoners retargeting<div class="qw-sub">2 ads disapproved — review policy flag before the set pauses further.</div></div>
+        </div>
+        <div class="qw-row">
+          <div class="qw-icon risk">?</div>
+          <div class="qw-text"><b>Investigate delivery drop</b> — Google Ads · Free Trial Signups (PMax)<div class="qw-sub">Impressions down sharply (z=−2.4) — check for a targeting, billing, or policy change.</div></div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="col-rail">
+
+      <div class="panel">
+        <div class="panel-head">
+          <div class="panel-title">Pacing</div>
+          <div class="panel-note mono">Jul MTD · day 22/31</div>
+        </div>
+
+        <div class="pace-row">
+          <div class="pace-top">
+            <div class="pace-name"><span class="cat-dot" style="background:var(--cat-google)"></span>Google Ads</div>
+            <div class="pace-pct on">102%</div>
+          </div>
+          <div class="pace-track"><div class="pace-fill" style="width:73%;background:var(--cat-google)"></div><div class="pace-target" style="left:71%"></div></div>
+          <div class="pace-sub mono">$13.1k of $18.0k plan</div>
+        </div>
+
+        <div class="pace-row">
+          <div class="pace-top">
+            <div class="pace-name"><span class="cat-dot" style="background:var(--cat-msft)"></span>Microsoft Ads</div>
+            <div class="pace-pct under">75%</div>
+          </div>
+          <div class="pace-track"><div class="pace-fill" style="width:53%;background:var(--cat-msft)"></div><div class="pace-target" style="left:71%"></div></div>
+          <div class="pace-sub mono">$3.2k of $6.0k plan</div>
+        </div>
+
+        <div class="pace-row">
+          <div class="pace-top">
+            <div class="pace-name"><span class="cat-dot" style="background:var(--cat-meta)"></span>Meta</div>
+            <div class="pace-pct on">112%</div>
+          </div>
+          <div class="pace-track"><div class="pace-fill" style="width:79%;background:var(--cat-meta)"></div><div class="pace-target" style="left:71%"></div></div>
+          <div class="pace-sub mono">$11.9k of $15.0k plan</div>
+        </div>
+
+        <div class="pace-row">
+          <div class="pace-top">
+            <div class="pace-name"><span class="cat-dot" style="background:var(--cat-openai)"></span>ChatGPT Ads</div>
+            <div class="pace-pct under">70%</div>
+          </div>
+          <div class="pace-track"><div class="pace-fill" style="width:50%;background:var(--cat-openai)"></div><div class="pace-target" style="left:71%"></div></div>
+          <div class="pace-sub mono">$1.2k of $2.5k plan</div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <button class="chat-toggle" id="chatToggle" aria-expanded="false">
+          <span class="panel-title">✦ AI troubleshooting chat</span>
+          <span class="panel-note" id="chatToggleLabel">Preview →</span>
+        </button>
+        <div class="chat-body" id="chatBody">
+          <div class="bubble user">Why did Microsoft CPA spike this week?</div>
+          <div class="bubble ai">
+            <span class="lbl">Hypothesis</span>
+            Search — Federal Contracting Keywords has been <b>limited_by_budget</b> for 4 straight days. That usually thins delivery toward lower-competition, lower-CPA auctions first — the mix shift, not the bids, is likely driving the CPA move.
+            <br><br><span class="lbl">Suggested check</span>
+            Compare hour-of-day delivery before vs. during the limited window. If it's concentrated in peak hours, raising daily budget ~20% is the fastest test.
+          </div>
+          <div class="chat-input">
+            <input type="text" placeholder="Ask about any flagged campaign…" disabled>
+            <button disabled>Send</button>
+          </div>
+          <div class="panel-note">Connects once Phase 4 (MCP server) is live — not wired up yet.</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="footnote">
+    Preview built against the real schema — <code>ad_metrics_daily</code>, <code>anomaly_flags</code>, <code>change_log</code> — with representative numbers, not a live pull. Layout doubles as the target for Phase 3.
+  </div>
+</div>
+
+<script>
+  const DATA = {
+    all: {
+      stats: [
+        { label: "Spend", value: "$12,880", delta: "+6.4%", dir: "up", sense: "flat" },
+        { label: "Impressions", value: "1.09M", delta: "−3.2%", dir: "down", sense: "bad" },
+        { label: "Clicks", value: "11,210", delta: "+1.1%", dir: "up", sense: "good" },
+        { label: "Blended CPA", value: "$91.57", delta: "−8.1%", dir: "down", sense: "good" },
+        { label: "Blended ROAS", value: "2.28×", delta: "+11.0%", dir: "up", sense: "good" },
+      ]
+    },
+    banana: {
+      stats: [
+        { label: "Spend", value: "$10,730", delta: "+7.2%", dir: "up", sense: "flat" },
+        { label: "Impressions", value: "1.00M", delta: "−3.8%", dir: "down", sense: "bad" },
+        { label: "Clicks", value: "9,870", delta: "+0.6%", dir: "up", sense: "good" },
+        { label: "Blended CPA", value: "$95.82", delta: "−5.4%", dir: "down", sense: "good" },
+        { label: "Blended ROAS", value: "2.02×", delta: "+4.8%", dir: "up", sense: "good" },
+      ]
+    },
+    lab: {
+      stats: [
+        { label: "Spend", value: "$2,150", delta: "+2.1%", dir: "up", sense: "flat" },
+        { label: "Impressions", value: "88.6k", delta: "+5.9%", dir: "up", sense: "good" },
+        { label: "Clicks", value: "1,340", delta: "+4.4%", dir: "up", sense: "good" },
+        { label: "Blended CPA", value: "$89.58", delta: "−12.6%", dir: "down", sense: "good" },
+        { label: "Blended ROAS", value: "2.90×", delta: "+18.3%", dir: "up", sense: "good" },
+      ]
+    }
+  };
+
+  const ANOMALIES = [
+    {
+      sev: "alert", platform: "google", account: "Bid Banana",
+      campaign: "PMax — Free Trial Signups", type: "impression_drop",
+      metric: "z = −2.4", metricSense: "bad",
+      detail: "Impressions fell to <b>2,150/day</b> vs a 28-day baseline of <b>7,300/day</b>. No creative or bid changes logged in the last 14 days.",
+      check: "Check for a policy review, billing hold, or an asset group paused upstream — a metrics-only drop with no change_log entry usually means something outside this system moved."
+    },
+    {
+      sev: "alert", platform: "meta", account: "Bid Banana",
+      campaign: "Retargeting — Trial Abandoners", type: "disapproval",
+      metric: "2 new", metricSense: "bad",
+      detail: "2 ads flipped to <b>disapproved</b> since yesterday, both in the same ad set.",
+      check: "Open Ads Manager → Account Quality for the specific policy reason, fix the flagged creative, and resubmit — disapprovals don't self-resolve."
+    },
+    {
+      sev: "warnv", platform: "msft", account: "Bid Banana",
+      campaign: "Search — Federal Contracting Keywords", type: "budget_limited",
+      metric: "4 days", metricSense: "bad",
+      detail: "serving_status has read <b>limited_by_budget</b> for 4 consecutive days — daily budget is $190.",
+      check: "This is the same campaign behind this week's CPA move (see the AI chat preview in the rail). Raising budget ~20% is the fastest test."
+    },
+    {
+      sev: "warnv", platform: "google", account: "Bid Banana",
+      campaign: "Search — GovCon Bid Intelligence", type: "serving_status_change",
+      metric: "eligible → limited", metricSense: "bad",
+      detail: "serving_status changed from <b>eligible</b> to <b>limited_by_budget</b> yesterday.",
+      check: "One day old — watch for it to persist 3+ days (which would escalate this to a budget_limited flag) before acting."
+    },
+    {
+      sev: "warnv", platform: "google", account: "The Bid Lab",
+      campaign: "Search — Branded Search", type: "cpa_zscore",
+      metric: "z = −1.9", metricSense: "good",
+      detail: "Rolling 7-day CPA of <b>$54.20</b> vs a 90-day baseline of <b>$89.10</b> — an unusually <i>good</i> CPA, not a problem.",
+      check: "Quick-win signal — see Quick wins panel. Worth a budget test before the window normalizes back toward baseline."
+    },
+    {
+      sev: "warnv", platform: "openai", account: "Bid Banana",
+      campaign: "Sponsored — Procurement Assistant Queries", type: "spend_pacing",
+      metric: "−42%", metricSense: "bad",
+      detail: "Today's spend is 42% below the trailing 14-day mean (min $10/day gate met).",
+      check: "New platform, still ramping — confirm the daily budget wasn't lowered, and check ad review_status hasn't gone to in_review across the ad group."
+    },
+  ];
+
+  const catColor = { google: "var(--cat-google)", msft: "var(--cat-msft)", meta: "var(--cat-meta)", openai: "var(--cat-openai)" };
+  const platformName = { google: "Google Ads", msft: "Microsoft Ads", meta: "Meta", openai: "ChatGPT Ads" };
+
+  function renderStats(key) {
+    const row = document.getElementById("statRow");
+    row.innerHTML = DATA[key].stats.map(s => {
+      const arrow = s.dir === "up" ? "↑" : "↓";
+      return `<div class="stat">
+        <div class="stat-label">${s.label}</div>
+        <div class="stat-value mono">${s.value}</div>
+        <div class="stat-delta ${s.dir} ${s.sense}">${arrow} ${s.delta} <span style="color:var(--ink-muted);font-weight:500">vs prior 7d</span></div>
+      </div>`;
+    }).join("");
+  }
+
+  function renderAnomalies(accountFilter) {
+    const list = document.getElementById("anomList");
+    const rows = ANOMALIES.filter(a => accountFilter === "all" ||
+      (accountFilter === "banana" && a.account === "Bid Banana") ||
+      (accountFilter === "lab" && a.account === "The Bid Lab"));
+
+    list.innerHTML = rows.map((a, i) => `
+      <div class="anom-row" role="button" tabindex="0" aria-expanded="false" data-idx="${i}">
+        <div class="anom-top">
+          <div class="sev-stripe ${a.sev}"></div>
+          <div class="anom-body">
+            <div class="anom-line1">
+              <span class="sev-tag ${a.sev}">${a.sev === "alert" ? "Alert" : "Warn"}</span>
+              <span class="plat-tag"><span class="cat-dot" style="background:${catColor[a.platform]}"></span><span style="color:${catColor[a.platform]}">${platformName[a.platform]}</span></span>
+              <span class="anom-campaign">${a.campaign}</span>
+            </div>
+            <div class="anom-meta">${a.account} · ${a.type}</div>
+          </div>
+          <div class="anom-metric ${a.metricSense}">${a.metric}</div>
+          <span class="anom-chev">▸</span>
+        </div>
+        <div class="anom-detail">${a.detail}<br><br><b>Suggested check:</b> ${a.check}</div>
+      </div>
+    `).join("");
+
+    list.querySelectorAll(".anom-row").forEach(row => {
+      row.addEventListener("click", () => {
+        const open = row.getAttribute("aria-expanded") === "true";
+        row.setAttribute("aria-expanded", open ? "false" : "true");
+      });
+      row.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" || e.key === " ") { e.preventDefault(); row.click(); }
+      });
+    });
+  }
+
+  document.getElementById("accountTabs").addEventListener("click", (e) => {
+    const btn = e.target.closest("button[data-account]");
+    if (!btn) return;
+    document.querySelectorAll("#accountTabs button").forEach(b => b.setAttribute("aria-selected", b === btn ? "true" : "false"));
+    renderStats(btn.dataset.account);
+    renderAnomalies(btn.dataset.account);
+  });
+
+  const chatToggle = document.getElementById("chatToggle");
+  const chatBody = document.getElementById("chatBody");
+  chatToggle.addEventListener("click", () => {
+    const open = chatToggle.getAttribute("aria-expanded") === "true";
+    chatToggle.setAttribute("aria-expanded", open ? "false" : "true");
+    chatBody.dataset.open = open ? "false" : "true";
+    document.getElementById("chatToggleLabel").textContent = open ? "Preview →" : "Hide";
+  });
+
+  renderStats("all");
+  renderAnomalies("all");
+</script>
+
+</body>
+</html>
