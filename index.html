@@ -413,7 +413,7 @@
   }
   .live-tag .dot { width: 5px; height: 5px; border-radius: 50%; background: var(--good); }
   .live-grid {
-    display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 12px; margin-bottom: 14px;
+    display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 12px; margin-bottom: 14px;
   }
   @media (max-width: 720px) { .live-grid { grid-template-columns: minmax(0,1fr); } }
   .live-card {
@@ -442,15 +442,10 @@
   <div class="topbar">
     <div class="brand">
       <span class="mark">ADS INTELLIGENCE</span>
-      <span class="sub">The Bid Lab · Bid Banana</span>
+      <span class="sub">Bid Banana</span>
       <span class="preview-tag"><span class="dot"></span>Preview — sample data</span>
     </div>
     <div class="topbar-controls">
-      <div class="tabs" id="accountTabs" role="tablist" aria-label="Account">
-        <button role="tab" aria-selected="true" data-account="all">All accounts</button>
-        <button role="tab" aria-selected="false" data-account="banana">Bid Banana</button>
-        <button role="tab" aria-selected="false" data-account="lab">The Bid Lab</button>
-      </div>
       <div class="date-chip">Trailing 7d <span class="mono">Jul 16–22</span></div>
     </div>
   </div>
@@ -520,19 +515,6 @@
           </div>
           <div class="live-card">
             <div class="live-card-head">
-              <div class="live-card-title"><span class="cat-dot" style="background:var(--cat-google)"></span>Google Ads · The Bid Lab</div>
-            </div>
-            <div class="live-days mono">Jul 20–21 · 2 days seen</div>
-            <div class="live-metrics">
-              <div><div class="live-metric-label">Spend</div><div class="live-metric-value mono">$146.30</div></div>
-              <div><div class="live-metric-label">Impressions</div><div class="live-metric-value mono">414</div></div>
-              <div><div class="live-metric-label">Clicks</div><div class="live-metric-value mono">38</div></div>
-              <div><div class="live-metric-label">Conversions</div><div class="live-metric-value mono">0</div></div>
-            </div>
-            <div class="live-flag crit">37 of 38 campaigns are <code>not_serving</code> — only 1 is eligible. Worth checking today, not from the (not-yet-built) anomaly engine, just from the raw pull.</div>
-          </div>
-          <div class="live-card">
-            <div class="live-card-head">
               <div class="live-card-title"><span class="cat-dot" style="background:var(--cat-openai)"></span>ChatGPT Ads · Bid Banana</div>
             </div>
             <div class="live-days mono">Jul 23–28 · 6 days seen</div>
@@ -563,10 +545,6 @@
         <div class="panel-head">
           <div class="panel-title">Quick wins</div>
           <div class="panel-note">Same-day actions</div>
-        </div>
-        <div class="qw-row">
-          <div class="qw-icon">↑</div>
-          <div class="qw-text"><b>Scale up</b> — The Bid Lab · Google Ads · Branded Search<div class="qw-sub">CPA 39% below 90-day baseline (z=−1.9). Test a budget increase.</div></div>
         </div>
         <div class="qw-row">
           <div class="qw-icon risk">$</div>
@@ -659,74 +637,45 @@
 </div>
 
 <script>
-  const DATA = {
-    all: {
-      stats: [
-        { label: "Spend", value: "$12,880", delta: "+6.4%", dir: "up", sense: "flat" },
-        { label: "Impressions", value: "1.09M", delta: "−3.2%", dir: "down", sense: "bad" },
-        { label: "Clicks", value: "11,210", delta: "+1.1%", dir: "up", sense: "good" },
-        { label: "Blended CPA", value: "$91.57", delta: "−8.1%", dir: "down", sense: "good" },
-        { label: "Blended ROAS", value: "2.28×", delta: "+11.0%", dir: "up", sense: "good" },
-      ]
-    },
-    banana: {
-      stats: [
-        { label: "Spend", value: "$10,730", delta: "+7.2%", dir: "up", sense: "flat" },
-        { label: "Impressions", value: "1.00M", delta: "−3.8%", dir: "down", sense: "bad" },
-        { label: "Clicks", value: "9,870", delta: "+0.6%", dir: "up", sense: "good" },
-        { label: "Blended CPA", value: "$95.82", delta: "−5.4%", dir: "down", sense: "good" },
-        { label: "Blended ROAS", value: "2.02×", delta: "+4.8%", dir: "up", sense: "good" },
-      ]
-    },
-    lab: {
-      stats: [
-        { label: "Spend", value: "$2,150", delta: "+2.1%", dir: "up", sense: "flat" },
-        { label: "Impressions", value: "88.6k", delta: "+5.9%", dir: "up", sense: "good" },
-        { label: "Clicks", value: "1,340", delta: "+4.4%", dir: "up", sense: "good" },
-        { label: "Blended CPA", value: "$89.58", delta: "−12.6%", dir: "down", sense: "good" },
-        { label: "Blended ROAS", value: "2.90×", delta: "+18.3%", dir: "up", sense: "good" },
-      ]
-    }
-  };
+  const STATS = [
+    { label: "Spend", value: "$10,730", delta: "+7.2%", dir: "up", sense: "flat" },
+    { label: "Impressions", value: "1.00M", delta: "−3.8%", dir: "down", sense: "bad" },
+    { label: "Clicks", value: "9,870", delta: "+0.6%", dir: "up", sense: "good" },
+    { label: "Blended CPA", value: "$95.82", delta: "−5.4%", dir: "down", sense: "good" },
+    { label: "Blended ROAS", value: "2.02×", delta: "+4.8%", dir: "up", sense: "good" },
+  ];
 
   const ANOMALIES = [
     {
-      sev: "alert", platform: "google", account: "Bid Banana",
+      sev: "alert", platform: "google",
       campaign: "PMax — Free Trial Signups", type: "impression_drop",
       metric: "z = −2.4", metricSense: "bad",
       detail: "Impressions fell to <b>2,150/day</b> vs a 28-day baseline of <b>7,300/day</b>. No creative or bid changes logged in the last 14 days.",
       check: "Check for a policy review, billing hold, or an asset group paused upstream — a metrics-only drop with no change_log entry usually means something outside this system moved."
     },
     {
-      sev: "alert", platform: "meta", account: "Bid Banana",
+      sev: "alert", platform: "meta",
       campaign: "Retargeting — Trial Abandoners", type: "disapproval",
       metric: "2 new", metricSense: "bad",
       detail: "2 ads flipped to <b>disapproved</b> since yesterday, both in the same ad set.",
       check: "Open Ads Manager → Account Quality for the specific policy reason, fix the flagged creative, and resubmit — disapprovals don't self-resolve."
     },
     {
-      sev: "warnv", platform: "msft", account: "Bid Banana",
+      sev: "warnv", platform: "msft",
       campaign: "Search — Federal Contracting Keywords", type: "budget_limited",
       metric: "4 days", metricSense: "bad",
       detail: "serving_status has read <b>limited_by_budget</b> for 4 consecutive days — daily budget is $190.",
       check: "This is the same campaign behind this week's CPA move (see the AI chat preview in the rail). Raising budget ~20% is the fastest test."
     },
     {
-      sev: "warnv", platform: "google", account: "Bid Banana",
+      sev: "warnv", platform: "google",
       campaign: "Search — GovCon Bid Intelligence", type: "serving_status_change",
       metric: "eligible → limited", metricSense: "bad",
       detail: "serving_status changed from <b>eligible</b> to <b>limited_by_budget</b> yesterday.",
       check: "One day old — watch for it to persist 3+ days (which would escalate this to a budget_limited flag) before acting."
     },
     {
-      sev: "warnv", platform: "google", account: "The Bid Lab",
-      campaign: "Search — Branded Search", type: "cpa_zscore",
-      metric: "z = −1.9", metricSense: "good",
-      detail: "Rolling 7-day CPA of <b>$54.20</b> vs a 90-day baseline of <b>$89.10</b> — an unusually <i>good</i> CPA, not a problem.",
-      check: "Quick-win signal — see Quick wins panel. Worth a budget test before the window normalizes back toward baseline."
-    },
-    {
-      sev: "warnv", platform: "openai", account: "Bid Banana",
+      sev: "warnv", platform: "openai",
       campaign: "Sponsored — Procurement Assistant Queries", type: "spend_pacing",
       metric: "−42%", metricSense: "bad",
       detail: "Today's spend is 42% below the trailing 14-day mean (min $10/day gate met).",
@@ -737,9 +686,9 @@
   const catColor = { google: "var(--cat-google)", msft: "var(--cat-msft)", meta: "var(--cat-meta)", openai: "var(--cat-openai)" };
   const platformName = { google: "Google Ads", msft: "Microsoft Ads", meta: "Meta", openai: "ChatGPT Ads" };
 
-  function renderStats(key) {
+  function renderStats() {
     const row = document.getElementById("statRow");
-    row.innerHTML = DATA[key].stats.map(s => {
+    row.innerHTML = STATS.map(s => {
       const arrow = s.dir === "up" ? "↑" : "↓";
       return `<div class="stat">
         <div class="stat-label">${s.label}</div>
@@ -749,13 +698,10 @@
     }).join("");
   }
 
-  function renderAnomalies(accountFilter) {
+  function renderAnomalies() {
     const list = document.getElementById("anomList");
-    const rows = ANOMALIES.filter(a => accountFilter === "all" ||
-      (accountFilter === "banana" && a.account === "Bid Banana") ||
-      (accountFilter === "lab" && a.account === "The Bid Lab"));
 
-    list.innerHTML = rows.map((a, i) => `
+    list.innerHTML = ANOMALIES.map((a, i) => `
       <div class="anom-row" role="button" tabindex="0" aria-expanded="false" data-idx="${i}">
         <div class="anom-top">
           <div class="sev-stripe ${a.sev}"></div>
@@ -765,7 +711,7 @@
               <span class="plat-tag"><span class="cat-dot" style="background:${catColor[a.platform]}"></span><span style="color:${catColor[a.platform]}">${platformName[a.platform]}</span></span>
               <span class="anom-campaign">${a.campaign}</span>
             </div>
-            <div class="anom-meta">${a.account} · ${a.type}</div>
+            <div class="anom-meta">${a.type}</div>
           </div>
           <div class="anom-metric ${a.metricSense}">${a.metric}</div>
           <span class="anom-chev">▸</span>
@@ -785,14 +731,6 @@
     });
   }
 
-  document.getElementById("accountTabs").addEventListener("click", (e) => {
-    const btn = e.target.closest("button[data-account]");
-    if (!btn) return;
-    document.querySelectorAll("#accountTabs button").forEach(b => b.setAttribute("aria-selected", b === btn ? "true" : "false"));
-    renderStats(btn.dataset.account);
-    renderAnomalies(btn.dataset.account);
-  });
-
   const chatToggle = document.getElementById("chatToggle");
   const chatBody = document.getElementById("chatBody");
   chatToggle.addEventListener("click", () => {
@@ -802,8 +740,8 @@
     document.getElementById("chatToggleLabel").textContent = open ? "Preview →" : "Hide";
   });
 
-  renderStats("all");
-  renderAnomalies("all");
+  renderStats();
+  renderAnomalies();
 </script>
 
 </body>
